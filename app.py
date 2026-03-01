@@ -27,7 +27,7 @@ class VGG16Multi(nn.Module):
             nn.Linear(512*7*7, 512), nn.ReLU(), nn.Dropout(0.5)
         )
         self.gender = nn.Sequential(nn.Linear(512, 1), nn.Sigmoid())
-        self.age = nn.Linear(512, 1)
+        self.age = nn.Sequential(nn.Linear(512, 1), nn.Sigmoid())
 
     def forward(self, x):
         x = self.features(x)
@@ -54,6 +54,7 @@ model.eval()
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
 @app.get("/", response_class=HTMLResponse)
