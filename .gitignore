@@ -1,1 +1,9 @@
 ai331/
+model.pth
+train/fairface-dataset/
+*.jpg
+train/fairface-dataset/train/
+train/fairface-dataset/val/
+train/fairface-dataset/*.jpg
+train/fairface-dataset/*/*.jpg
+train/fairface-dataset/*/*/*.jpg
