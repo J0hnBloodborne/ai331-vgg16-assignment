@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const resultGender = document.getElementById('result-gender');
     const resultAge = document.getElementById('result-age');
+    const resultRace = document.getElementById('result-race');
     const errorMessage = document.getElementById('error-message');
 
     // Drag and drop handlers
@@ -125,16 +126,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             // Validate response format
-            if (!('gender' in data) || !('age' in data)) {
+            if (!('gender' in data) || !('age' in data) || !('race' in data)) {
                 throw new Error('Invalid response format from server');
             }
 
             // Update results UI
             resultGender.textContent = data.gender;
-            
             // Format age (round if it's a number, otherwise just display string)
             const formattedAge = typeof data.age === 'number' ? Math.round(data.age) : data.age;
             resultAge.textContent = formattedAge;
+            resultRace.textContent = data.race || '-';
 
             // Show results
             loadingState.classList.add('hidden');
