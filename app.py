@@ -16,6 +16,8 @@ app = FastAPI(title="Demographic Analysis API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+RACE_LABELS = ['East Asian', 'Indian', 'Black', 'White', 'Middle Eastern', 'Latino_Hispanic', 'Southeast Asian']
+
 class VGG16Multi(nn.Module):
     def __init__(self):
         super().__init__()
@@ -28,6 +30,7 @@ class VGG16Multi(nn.Module):
         )
         self.gender = nn.Sequential(nn.Linear(512, 1), nn.Sigmoid())
         self.age = nn.Sequential(nn.Linear(512, 1), nn.Sigmoid())
+        self.race = nn.Linear(512, 7)
 
     def forward(self, x):
         x = self.features(x)
@@ -36,7 +39,8 @@ class VGG16Multi(nn.Module):
         x = self.fc(x)
         gender = self.gender(x)
         age = self.age(x)
-        return gender, age
+        race = self.race(x)
+        return gender, age, race
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = VGG16Multi()
@@ -74,14 +78,17 @@ async def predict(file: UploadFile = File(...)):
         input_tensor = transform(image).unsqueeze(0).to(device)
         
         with torch.no_grad():
-            out_gender, out_age = model(input_tensor)
+            out_gender, out_age, out_race = model(input_tensor)
             gender_prob = out_gender.item()
             predicted_gender = "Female" if gender_prob > 0.5 else "Male"
             raw_age = out_age.item()
             predicted_age = raw_age * 75.0
+            race_idx = out_race.argmax(dim=1).item()
+            predicted_race = RACE_LABELS[race_idx]
             return {
                 "gender": predicted_gender,
-                "age": round(predicted_age, 1)
+                "age": round(predicted_age, 1),
+                "race": predicted_race
             }
             
     except Exception as e:

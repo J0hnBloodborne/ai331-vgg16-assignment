@@ -7,3 +7,4 @@ train/fairface-dataset/val/
 train/fairface-dataset/*.jpg
 train/fairface-dataset/*/*.jpg
 train/fairface-dataset/*/*/*.jpg
+__pycache__/
